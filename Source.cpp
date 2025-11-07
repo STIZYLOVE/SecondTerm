@@ -5,13 +5,30 @@
 
 enum class ValueQuality
 {
-   trash, common, rare, mythic, legendary
+    trash, common, rare, mythic, legendary
+};
+enum class characterTyper
+{
+    warrior, wizard, paladin
+};
+enum class mainMenu
+{
+    newGame, loadGame, settings, quit
+};
+enum class weaponsType
+{
+    dagger, magicWand, magicSword, morgen, hammer
+};
+enum class spellsType
+{
+    fireBlast, earthQuake, waveForm, sunStrike, natureFlash
 };
 
 //отличие struct от class
 
 struct Treasure
 {
+    Treasure() = default;
     string name{ "добыча" };
     ValueQuality quality = ValueQuality::trash;
     unsigned int price{ 0 };
@@ -47,6 +64,24 @@ struct Cloth : Treasure
     unsigned int armor{ 1 };
 };
 
+struct Weapon
+{
+    Weapon() = default;
+    string name{ "Оружие" };
+    weaponsType weapon = weaponsType::dagger;
+    ValueQuality quality = ValueQuality::trash;
+    unsigned short damage{ 1 };
+};
+
+struct Spell
+{
+    Spell() = default;
+    string name{ "Заклинание" };
+    spellsType weapon = spellsType::fireBlast;
+    unsigned short damage{ 1 };
+    unsigned short manaCost{ 1 };
+};
+
 using namespace std;
 
 //модификаторы доступа:
@@ -68,14 +103,18 @@ int main()
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
 
+    Weapon weapon;
+    weapon.name = "Ядовитый клинок";
+    weapon.damage = 10;
+    weapon.quality = ; //дописать
 
-    Cloth cloth(ValueQuality::mythic);
+   /* Cloth cloth(ValueQuality::mythic);
     cloth.armor = 10;
     cloth.site = cloth.valueSite[3];
     cloth.name = "Шлем властителя подземелий";
     cloth.price = 50;
 
-    cout << cloth.name << '\n' << cloth.site << '\n' << cloth.armor << '\n'  << cloth.price << '\n';
+    cout << cloth.name << '\n' << cloth.site << '\n' << cloth.armor << '\n'  << cloth.price << '\n';*/
 
 
     Warrior* warrior = new Warrior();
