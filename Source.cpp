@@ -3,6 +3,8 @@
 #include "BaseClass.h"
 #include "StartClasses.h"
 
+using namespace std;
+
 enum class ValueQuality
 {
     trash, common, rare, mythic, legendary
@@ -17,14 +19,55 @@ enum class mainMenu
 };
 enum class weaponsType
 {
-    dagger, magicWand, magicSword, morgen, hammer
+    dagger, magicWand, magicSword, morgenshtern, hammer
 };
 enum class spellsType
 {
-    fireBlast, earthQuake, waveForm, sunStrike, natureFlash
+    quickSpell, hardSpell, areaSpell, shieldSpell, ultimateSpell
 };
 
-//отличие struct от class
+enum class CharacterType
+{
+    UNKNOWN =0,
+    WARRIOR,
+    WIZARD,
+    PALADIN
+};
+
+unsigned short TestChoise(unsigned short maxChoise, string text)
+{
+    unsigned short choise = 1;
+    cin >> choise;
+    while (choise > maxChoise || choise < 1)
+    {
+        cout << text << endl;
+        cin >> choise;
+    }
+    return choise;
+};
+
+unique_ptr<Npc> CreateCharacter(CharacterType type)
+{
+    switch (type)
+    {
+    case CharacterType::UNKNOWN:
+        return make_unique<Npc>();
+        break;
+    case CharacterType::WARRIOR:
+        return make_unique<Warrior>();
+        break;
+    case CharacterType::WIZARD:
+        return make_unique<Wizard>();
+        break;
+    case CharacterType::PALADIN:
+        return make_unique<Paladin>();
+        break;
+    default:
+        throw
+            invalid_argument("Неизвестный тип персонажа");
+        break;
+    }
+}
 
 struct Treasure
 {
@@ -63,7 +106,6 @@ struct Cloth : Treasure
     string site{ NULL };  
     unsigned int armor{ 1 };
 };
-
 struct Weapon
 {
     Weapon() = default;
@@ -72,29 +114,14 @@ struct Weapon
     ValueQuality quality = ValueQuality::trash;
     unsigned short damage{ 1 };
 };
-
 struct Spell
 {
     Spell() = default;
     string name{ "Заклинание" };
-    spellsType weapon = spellsType::fireBlast;
+    spellsType weapon = spellsType::quickSpell;
     unsigned short damage{ 1 };
     unsigned short manaCost{ 1 };
 };
-
-using namespace std;
-
-//модификаторы доступа:
-// private - приватный, запрещает доступ к свойствам и классам
-//           за пределами самого класса
-// protected - защищенный, можно передавать свойства и методы
-//        в классы наследники, но все еще нельзя использовать
-//        в основном потоке программы
-// public - публичный, общедоступный, можно использовать везде
-
-
-//базовый класс - абстрактный (класс у которого все методы виртуальные)
-
 
 
 int main()
@@ -103,110 +130,28 @@ int main()
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
 
-    Weapon weapon;
-    weapon.name = "Ядовитый клинок";
-    weapon.damage = 10;
-    weapon.quality = ; //дописать
-
-   /* Cloth cloth(ValueQuality::mythic);
-    cloth.armor = 10;
-    cloth.site = cloth.valueSite[3];
-    cloth.name = "Шлем властителя подземелий";
-    cloth.price = 50;
-
-    cout << cloth.name << '\n' << cloth.site << '\n' << cloth.armor << '\n'  << cloth.price << '\n';*/
-
-
-    Warrior* warrior = new Warrior();
-    Warrior* warrior2 = new Warrior();
-    cout << (*warrior == *warrior2) << endl;
-
-    Wizard* wizard = new Wizard();
-    Paladin* paladin = new Paladin();
     Player* player = new Player();
 
-    cout << "Привет, путник\nПрисядь у костра и расскажи о себе\n";
-    cout << "Ты впервые тут? (1 - новый персонаж, 2 - загрузить)\n";
-    unsigned short choise = 1;
-    cin >> choise;
-    while (choise > 2 || choise < 1)
+    cout << "Привет путник\nПрисядь у костра и расскажи о себе\nТы впервые тут?\n\t1 - новый персонаж\n\t2 - загрузить";
+
+    if (TestChoise(2, "Наверное ты ошибся, повтори снова"))
     {
-        cout << "Наверное ты ошибся, повтори снова\n";
-        cin >> choise;
-    }
-    /*
-    unsigned short maxChoise = 3;
-    unsigned short TestChoise(unsigned short maxChoise, string text);
-    {
-        unsigned short choise = 1;
-        cin >> choise;
-        while (choise > maxChoise || choise < 1)
+        cout << "Расскажи о своих навыках \n\t1 - Воин\n\t2 - Волшебник\n\t3 - Паладин";
+        unique_ptr<Npc> character;
+        switch (TestChoise(4, "Такого еще не было в наших краях\nНе мог бы ты повторить"))
         {
-            cout << "Наверное ты ошибся, повтори снова\n";
-            cin >> choise;
-        }
-        return choise;
-
-       
-    };
-
-    */
-    
-    if (choise == 1)
-    {
-        cout << "Расскажи о своих навыках\n\t1 - Воин\n\t2 - Волшебник\n\t3 - Паладин\n";
-
-        // тут уже будет вызвана ваша красивая функция
-        cin >> choise;
-        while (choise > 3 || choise < 1)
-        {
-            cout << "Такого еще не было в наших краях\nНе мог бы ты повторить\n";
-            cin >> choise;
-        }
-
-
-        switch (choise)
-        {
-        case 1: {
-            player->Create(warrior);
-            delete wizard;
-            wizard = nullptr;
-            delete paladin;
-            paladin = nullptr;
-            break; }
-        case 2: {
-            player->Create(wizard);
-            delete warrior;
-            warrior = nullptr;
-            delete paladin;
-            paladin = nullptr;
-            cout << " " << endl;
-            break; }
-        case 3: {
-            player->Create(paladin);
-            delete warrior;
-            warrior = nullptr;
-            delete wizard;
-            wizard = nullptr;
-            break; }
-        }
-
+            case 1:
+                character = CreateCharacter(CharacterType::WARRIOR);
+                break;
+            case 2:
+                character = CreateCharacter(CharacterType::WIZARD);
+                break;
+            case 3:
+                character = CreateCharacter(CharacterType::PALADIN);
+                break;
+        } 
+        player->Create(move(character));
     }
-
-    else
-    {
-        player->Load(warrior);
-    }
-
-    cout << "сделаем остановку тут?\n\t1 - сохранить игру\n\t2 - продолжить\n";
-    cin >> choise;
-    if (choise == 1)
-    {
-        if (warrior != nullptr) player->Save(warrior);
-        if (wizard != nullptr) player->Save(wizard);
-        if (paladin != nullptr) player->Save(paladin);
-    }
-
 
 
     return 0;
