@@ -20,21 +20,24 @@ public:    //публичный модификатор доступ (испол�
     float GetDamage();
     unsigned int GetLvl();
     virtual void GetInfo();
-
     virtual void Create() {};
-    virtual bool Save();
-   
-    Npc Load();
-    
-
-
-
 };
 class Player
 {
+private:
+    unique_ptr<Npc> currentCharacter;
 public:
-    void Create(Npc* player);
-    void Save(Npc* player);
-    void Load(Npc* player);
-    
+    void Create(unique_ptr<Npc> player)
+    {
+        currentCharacter = move(player);
+        currentCharacter->Create();
+    }
+    void Create()
+    {
+        if (currentCharacter != NULL)
+            currentCharacter->Create();
+    }
+    Npc* GetCharacter() {
+        return currentCharacter.get();
+    }
 };
