@@ -1,29 +1,20 @@
 #pragma once
 #include "BaseClass.h"
+#include <string>
 
-//наследование - использование доступных свойств
-// и методов класса родителям (parent), классом наследником(child)
-class Warrior : public virtual Npc //наследование с модификатором доступа public
+class Warrior : public virtual Npc
 {
-protected:  //модификатор 0 (приватный - защищенный, доступ к полям, только внутри класса)
+protected:
     unsigned short strenght{ 31 };
     string weapons[4] = { "кастет", "дубинка", "клинок", "меч" };
 public:
-    //конструктор - метод, который вызывается в момент создания экземпляра
-    //класса (вручную вызвать в основном потоке программы не можем)
-    bool Save() override;
-    Warrior Load();
-    Warrior();//конструктор по умолчанию, когда нет аргументов
-              //кастомный конструктор
+    Warrior();
     Warrior(string name, unsigned int health, float damage);
 
     void GetWeapons();
-    void GetInfo() override;  //полиморфизм (перегрузка для метода)
+    void GetInfo() override;
     void Create() override;
     
-    //перегрузка операторов
-    //перегрузка оператора сравнения (==)
-
     bool operator == (const Warrior& warrior) const;
         void operator = (Npc npc);
  
@@ -32,13 +23,61 @@ public:
 };
 
 
-//virtual - создает виртуализацию методов, классов
-//при этом сам класс повторно не создается
 class Wizard : public virtual Npc
 {
+public:
+    class Spell
+    {
+    protected:
+        string name{"заклинание"};
+        unsigned short damage{ 0 };
+        unsigned short price{ 0 };
+        bool isCurse{ false };    
+        int timeCast{ 0 };
+    public:
+        Spell(string name = "заклинание", unsigned short damage = 0, unsigned short price = 0, bool isCurse = false, int timeCast = 0)
+        {
+            this->name = name;
+            this->damage = damage;
+            this->price = price;
+            this->isCurse = isCurse;
+            this->timeCast = timeCast;
+        }
+
+        string operator[](unsigned index) const
+        {
+            switch (index)
+            {
+            case 0: return name; break;
+            case 1: return to_string(damage); break;
+            case 2: return to_string(price); break;
+            case 3:
+                if (isCurse)
+                    cout << "Переодичный урон";
+                else
+                    cout << "Моментальный урон";
+                break;
+            case 4: return to_string(timeCast); break;
+            default: cout << "Такого свойства не существует" << endl; break;
+            }
+        }
+
+        unsigned short CastSpell()
+        {
+            cout << "Вы применили заклинание " << name << " на противнике" << endl;
+            return damage;
+        }
+    };
 protected:
     unsigned short intellect = 27;
-    string spell[4] = { "вспышка", "магисческая стрела", "огненный шар", "метеоритный дождь" };
+    Spell spells[5] =
+    {
+        Spell("огненный шар", 20, 10, false, 3),
+        Spell("оцепенение", 10, 15, true, 1),
+        Spell("магические стрелы", 40, 25, false, 5),
+        Spell("торнадо", 15, 30, false, 2),
+        Spell("Яд", 10, 10, true, 1)
+    };
 public:
     Wizard()
     {
@@ -53,19 +92,24 @@ public:
         this->health = health;
         this->damage = damage;
     }
-    void GetInfo() override  //полиморфизм (перегрузка для метода)
+    void GetInfo() override
     {
         Npc::GetInfo();
         cout << "Интеллект - " << intellect << endl;
-        cout << "Доступные заклинания в книге заклинаний - ";
-        for (int i = 0; i < lvl; i++)
-        {
-            cout << spell[i] << endl;
-        }
+        cout << "Доступные заклинания в книге заклинаний: " << endl;
+        GetSpellsInfo();
     }
-    void CastSpell()
+    void GetSpellsInfo()
     {
-        cout << name << " применяет " << spell[lvl - 1] << endl;
+        for (int i = 0; i < 5; i++)
+        {
+            cout << i + 1 << " заклинание: ";
+            for (int j = 0; j < 5; j++)
+            {
+                cout << spells[i][j] << endl;
+            }
+            cout << endl;
+        }
     }
     void Create() override
     {
@@ -73,11 +117,11 @@ public:
         cout << "Введите имя персонажа\t";
         cin >> name;
         GetInfo();
-        CastSpell();
     }
     bool operator == (const Wizard& wizard) const
     {
-        return ((wizard.damage == this->damage) && (wizard.health == this->health)
+        return ((wizard.damage == this->damage)
+            && (wizard.health == this->health)
             && (wizard.intellect == this->intellect));
     }
     void operator = (Npc npc)
@@ -87,41 +131,16 @@ public:
         this->name = npc.GetDamage();
         this->name = npc.GetLvl();
     }
-    bool Save() override
-    {
-
-
-        if (Npc::Save())
-        {
-            ofstream saveSystem("save.bin", ios::binary);
-            if (saveSystem.is_open())
-            {
-
-                saveSystem.write(reinterpret_cast<const char*>(&intellect), sizeof(intellect));
-                for (int i = 0; i < 4; i++)
-                {
-                    saveSystem.write(reinterpret_cast<const char*>(&spell[i]), sizeof(spell[i]));
-                }
-                saveSystem.close();
-                return true;
-            }
-            else
-            {
-                cout << "сохранение не удалось" << endl;
-                return false;
-            }
-        }
-    }
-    ~Wizard() //деструктор всегда без аргументов
+    ~Wizard()
     {
         cout << name << " испустил дух" << endl;
     }
 
 };
 
-//множественное наследование
+
 class Paladin : public Warrior, public Wizard
-    //следующий родительственный класс добавляется через запятую
+    
 {
 public:
     Paladin()
@@ -135,10 +154,14 @@ public:
     {
         Warrior::GetInfo();
         cout << "Интеллект - " << intellect << endl;
-        cout << "Доступные заклинания в книге заклинаний - ";
-        for (int i = 0; i < lvl; i++)
+        cout << "Доступные заклинания в книге заклинаний: ";
+        for (int i = 0; i < 5; i++)
         {
-            cout << spell[i] << endl;
+            cout << i + 1 << "заклинание: ";
+            for (int j = 0; j < 5; j++)
+            {
+                cout << spells[i][j] << endl;
+            }
         }
     }
     void Create() override
@@ -147,7 +170,6 @@ public:
         cout << "Введите имя персонажа\t";
         cin >> name;
         GetInfo();
-        CastSpell();
         GetWeapons();
     }
     bool operator == (const Paladin& paladin) const
@@ -161,31 +183,6 @@ public:
         this->name = npc.GetHealth();
         this->name = npc.GetDamage();
         this->name = npc.GetLvl();
-    }
-    bool Save() override
-    {
-
-
-        if (Npc::Save())
-        {
-            ofstream saveSystem("save.bin", ios::binary);
-            if (saveSystem.is_open())
-            {
-
-                saveSystem.write(reinterpret_cast<const char*>(&intellect), sizeof(intellect));
-                for (int i = 0; i < 4; i++)
-                {
-                    saveSystem.write(reinterpret_cast<const char*>(&spell[i]), sizeof(spell[i]));
-                }
-                saveSystem.close();
-                return true;
-            }
-            else
-            {
-                cout << "сохранение не удалось" << endl;
-                return false;
-            }
-        }
     }
 };
 
