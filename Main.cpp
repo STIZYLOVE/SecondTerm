@@ -3,7 +3,6 @@
 #include <chrono>
 #include <thread>
 #include <cstdlib>
-#include <limits>
 
 #include "windows.h"
 
@@ -13,9 +12,21 @@
 #include "NpcClass.h"
 #include "playerClass.h"
 #include "Enemy.h"
-
+#include "ConsoleManager.h"
 
 using namespace std;
+
+enum ColorConsole {
+    Black = 0,
+    DarkBlue = 1,
+    Green = 2,
+    Blue = 3,
+    Red = 4,
+    Purple = 5,
+    Yellow = 6,
+    White = 7,
+    Gray = 8
+};
 
 enum class ValueQuality
 {
@@ -114,47 +125,6 @@ unique_ptr<Npc> CreateCharacter(CharacterType type)
     }
 }
 
-void Pause(bool needText)
-{
-    if (needText)
-        cout << "Enter чтобы продолжить...";
-    cin.get();
-    cout << endl;
-}
-
-void printSlowly(const string& text, double charsPerSecond, bool needPause)
-{
-    if (charsPerSecond <= 0) {
-        cout << text;
-        if (needPause) Pause(false);
-        return;
-    }
-
-    auto delay = chrono::duration<double>(1.0 / charsPerSecond);
-
-    for (char c : text) {
-        cout << c << flush;
-        this_thread::sleep_for(delay);
-    }
-
-    if (needPause) {
-        Pause(false);
-    }
-}
-
-void ShowName(string name)
-{
-    cout << "[" << name << "]" << endl;
-}
-
-void ClearScreen() {
-#ifdef _WIN32
-    system("cls");
-#else
-    system("clear");
-#endif
-}
-
 int main()
 {
     setlocale(LC_ALL, "Rus");
@@ -163,8 +133,27 @@ int main()
 
     Player* player = new Player();
 
+    ShowName("Настройка");
+    printSlowly("Выберите скорость текста:\n\t1 - Медленная\n\t2 - Оптимальная\n\t3 - Быстрая\n\t4 - Моментальная\n", false);
+
+    switch (TestChoise(4, "Такой настройки нет!"))
+    {
+    case 1:
+        ChangeDefaulSpeed(30);
+        break;
+    case 2:
+        ChangeDefaulSpeed(60);
+        break;
+    case 3:
+        ChangeDefaulSpeed(90);
+        break;
+    case 4:
+        ChangeDefaulSpeed(0);
+        break;
+    }
+
     ShowName("Незнакомец");
-    printSlowly("Привет, путник\nПрисядь у костра и расскажи о себе\nТы кем будешь?\n\t", 20, false);
+    printSlowly("Привет, путник\nПрисядь у костра и расскажи о себе\nТы кем будешь?\n\t", false);
     cout << "1 - Воин\n\t2 - Ассасин\n\t3 - Нинзя\n";
 
     unique_ptr<Npc> character;
@@ -187,18 +176,42 @@ int main()
 
     auto playerCharacter = player->GetCharacter();
 
+    Pause(false);
     Pause(true);
 
     ClearScreen();
 
     ShowName("Незнакомец");
-    printSlowly("Ну что, приятно познакомится ", 20, false);
+    printSlowly("Ну что, приятно познакомится ", false);
     printSlowly(playerCharacter->GetName() + "\n", 2, false);
-    printSlowly("Я Марк, воин! Ты чего забыл в этом лесу?", 20, true);
+    printSlowly("Я Марк, воин! Ты чего забыл в этом лесу?", true);
 
     ShowName(playerCharacter->GetName());
-    printSlowly("Взаимно! Я блуждаю в этих лесах, чтобы найти полезные ", 20, false);
-    printSlowly("артефакты", 4, true);
+    printSlowly("Взаимно! Я блуждаю в этих лесах, чтобы найти полезные ", false);
+    printSlowly("артефакты.", 4, true);
+
+    ShowName("Марк");
+    printSlowly("Ха-ха, да ладно, какие такие артефакты ты думаешь здесь затерялись?", true);
+
+    ShowName(playerCharacter->GetName());
+    printSlowly("Можешь смеяться сколько угодно, я намерен найти ", false);
+    printSlowly("Четвёртый Дар.", 15, true, Yellow);
+
+    ShowName("Марк");
+    printSlowly("Ха-ха-ха, уже тринадцатое десятилетие, а ты всё веришь в эти сказки?", true);
+
+    ShowName(playerCharacter->GetName());
+    printSlowly("...", 1, true, Red);
+
+    ShowName("Марк");
+    printSlowly("Извини, я просто в который раз слышу об этом артефакте, но то всё были пустые слова.\n", false);
+    printSlowly("Я вижу ты настроен крайне серьёзно, может я присоеденюсь к тебе, меня всё равно выгнали из замка.\n", true);
+
+    ClearScreen();
+
+    printSlowly("Возьмёте ли вы Марка с собой?\n\t 1 - Хорошо, присоединяйся.\n\t 2 - Нет, извини.\n", false);
+
+    TestChoise(1, "Отказаться не получится, он выглядит слишком грустным");
 
     return 0;
 }
