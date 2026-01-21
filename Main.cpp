@@ -152,6 +152,8 @@ int main()
         break;
     }
 
+    ClearScreen();
+
     ShowName("Незнакомец");
     printSlowly("Привет, путник\nПрисядь у костра и расскажи о себе\nТы кем будешь?\n\t", false);
     cout << "1 - Воин\n\t2 - Ассасин\n\t3 - Нинзя\n";
@@ -225,6 +227,41 @@ int main()
     printSlowly("Лес Фей.", 20, false, Purple);
     printSlowly("\nГоворят там живёт фея Мантра, самая долгоживущая из своего рода. ", false);
     printSlowly("Она явно что-то знает.", true);
+
+    ClearScreen();
+
+    printSlowly("Вы отправляетесь в ", 10, false);
+    printSlowly("Лес Фей",3,false, Purple);
+    printSlowly("...", 1, true);
+
+    printSlowly("По дороге вы нашли старое разрушенное здание, рядом стоит стундук. ", false);
+    printSlowly("Вы хотите открыть сундук?\n\t 1 - Взглянуть.\n\t 2 - Не сотоит.\n", false);
+
+    int choise;
+
+    choise = TestChoise(2);
+
+    ClearScreen();
+
+    if (choise == 1)
+    {
+        printSlowly("Вам повезло! Помимо ненужного хлама вы нашли ", false);
+        printSlowly("Кристал Жизни", 3, false, Red);
+        printSlowly(". Максимальный уровень здоровья увеличен на (5).\n", true);
+
+        playerCharacter->ChangeMaxHealth(5);
+
+        playerCharacter->GetInfo();
+        cout << endl;
+        Pause(true);
+
+        ShowName("Марк");
+        printSlowly("Вот это халява!", true);
+    }
+    else if (choise == 2)
+    {
+        printSlowly("Вы решили что трогать чужое - плохо.", false);
+    }
 
     return 0;
 }
