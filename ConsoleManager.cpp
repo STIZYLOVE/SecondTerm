@@ -15,7 +15,7 @@ double defaultCharsPerSecond = 30;
 void Pause(bool needText)
 {
     if (needText)
-        cout << "Enter ����� ����������...";
+        cout << "Enter чтобы продолжить...";
     cin.get();
     cout << endl;
 }
@@ -42,7 +42,7 @@ void printSlowly(const string& text, bool needPause)
 
 void printSlowly(const string& text, double charsPerSecond, bool needPause)
 {
-    if (charsPerSecond <= 0) {
+    if (charsPerSecond <= 0 || defaultCharsPerSecond == 0) {
         cout << text;
         if (needPause) Pause(false);
         return;
@@ -66,9 +66,10 @@ void printSlowly(const string& text, double charsPerSecond, bool needPause, int 
 
     SetConsoleTextAttribute(hConsole, color);
 
-    if (charsPerSecond <= 0) {
+    if (charsPerSecond <= 0 || defaultCharsPerSecond == 0) {
         cout << text;
         if (needPause) Pause(false);
+        SetConsoleTextAttribute(hConsole, 7);
         return;
     }
 
